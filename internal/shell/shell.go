@@ -11,7 +11,13 @@ import (
 	"minishell_go/internal/parser"
 )
 
-func Run() error {
+type Runner interface {
+	Run() error
+}
+type Shell struct {
+}
+
+func (sh Shell) Run() error {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("> ")

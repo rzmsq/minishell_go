@@ -4,12 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"minishell_go/internal/shell"
+	sh "minishell_go/internal/shell"
 	"os"
 )
 
 func main() {
-	err := shell.Run()
+
+	shell := sh.Shell{}
+	runner := sh.Runner(shell)
+
+	err := runner.Run()
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			os.Exit(0)

@@ -1,84 +1,25 @@
 package executor
 
 import (
-	"errors"
-	"fmt"
+	"minishell_go/internal/commands/cd"
+	"minishell_go/internal/commands/echo"
+	"minishell_go/internal/commands/kill"
+	"minishell_go/internal/commands/ps"
+	"minishell_go/internal/commands/pwd"
 	"os"
 	"os/exec"
-	"strconv"
-	"strings"
 )
 
-var errInvalidArg = errors.New("invalid argument")
+type Executor interface {
+	Run() error
+}
 
 var builtInCmd = map[string]Executor{
-	"cd":   cd{},
-	"pwd":  pwd{},
-	"echo": echo{},
-	"kill": kill{},
-	"ps":   ps{},
-}
-
-type Executor interface {
-	run() error
-}
-
-type cd struct {
-	path string
-}
-
-func (c cd) run() error {
-	return os.Chdir(c.path)
-}
-
-type pwd struct {
-}
-
-func (p pwd) run() error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(dir)
-
-	return nil
-}
-
-type echo struct {
-	str []string
-}
-
-func (e echo) run() error {
-	fmt.Println(strings.Join(e.str, " "))
-	return nil
-}
-
-type kill struct {
-	arg string
-}
-
-func (k kill) run() error {
-	pid, err := strconv.Atoi(k.arg)
-	if err != nil {
-		return errInvalidArg
-	}
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		return err
-	}
-	err = process.Kill()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type ps struct {
-}
-
-func (p ps) run() error {
-	return nil
+	"cd":   cd.Cd{},
+	"pwd":  pwd.Pwd{},
+	"echo": echo.Echo{},
+	"kill": kill.Kill{},
+	"ps":   ps.Ps{},
 }
 
 func Execute(command []string) error {
@@ -87,7 +28,7 @@ func Execute(command []string) error {
 
 	if _, ok := builtInCmd[cmdName]; ok {
 		action := builtInCmd[cmdName]
-		err := action.run()
+		err := action.Run()
 		if err != nil {
 			return err
 		}
