@@ -14,7 +14,7 @@ import (
 type Ps struct {
 }
 
-func (p Ps) Run() error {
+func (p *Ps) Run() error {
 	processes, err := ps.Processes()
 	if err != nil {
 		return fmt.Errorf("%f: %v", msErr.ErrGetProcesses, err)
@@ -42,5 +42,9 @@ func (p Ps) Run() error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (p *Ps) SetArguments(interface{}) error {
 	return nil
 }

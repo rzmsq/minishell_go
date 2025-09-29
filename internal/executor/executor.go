@@ -12,23 +12,28 @@ import (
 
 type Executor interface {
 	Run() error
+	SetArguments(interface{}) error
 }
 
 func Execute(command []string) error {
-	var builtInCmd = map[string]Executor{
-		"cd":   cd.Cd{},
-		"pwd":  pwd.Pwd{},
-		"echo": echo.Echo{},
-		"kill": kill.Kill{},
-		"ps":   ps.Ps{},
-	}
-
 	cmdName := command[0]
 	cmdArgs := command[1:]
 
+	var builtInCmd = map[string]Executor{
+		"cd":   &cd.Cd{},
+		"pwd":  &pwd.Pwd{},
+		"echo": &echo.Echo{},
+		"kill": &kill.Kill{},
+		"ps":   &ps.Ps{},
+	}
+
 	if _, ok := builtInCmd[cmdName]; ok {
 		action := builtInCmd[cmdName]
-		err := action.Run()
+		err := action.SetArguments(cmdArgs)
+		if err != nil {
+			return err
+		}
+		err = action.Run()
 		if err != nil {
 			return err
 		}
