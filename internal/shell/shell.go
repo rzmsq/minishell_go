@@ -17,7 +17,7 @@ type Runner interface {
 type Shell struct {
 }
 
-func (sh Shell) Run() error {
+func (sh *Shell) Run() error {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("> ")
