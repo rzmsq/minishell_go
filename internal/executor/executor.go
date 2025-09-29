@@ -14,15 +14,15 @@ type Executor interface {
 	Run() error
 }
 
-var builtInCmd = map[string]Executor{
-	"cd":   cd.Cd{},
-	"pwd":  pwd.Pwd{},
-	"echo": echo.Echo{},
-	"kill": kill.Kill{},
-	"ps":   ps.Ps{},
-}
-
 func Execute(command []string) error {
+	var builtInCmd = map[string]Executor{
+		"cd":   cd.Cd{},
+		"pwd":  pwd.Pwd{},
+		"echo": echo.Echo{},
+		"kill": kill.Kill{},
+		"ps":   ps.Ps{},
+	}
+
 	cmdName := command[0]
 	cmdArgs := command[1:]
 
@@ -32,15 +32,15 @@ func Execute(command []string) error {
 		if err != nil {
 			return err
 		}
-	}
+	} else {
+		cmd := exec.Command(cmdName, cmdArgs...)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 
-	cmd := exec.Command(cmdName, cmdArgs...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return err
+		if err := cmd.Run(); err != nil {
+			return err
+		}
 	}
 
 	return nil
