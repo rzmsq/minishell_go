@@ -30,6 +30,11 @@ func (k *Kill) SetArguments(arg interface{}) error {
 
 	switch arg.(type) {
 	case []string:
+		args := arg.([]string)
+		if len(args) == 0 {
+			return msErr.ErrInvalidArg
+		}
+
 		n, err := strconv.Atoi(arg.([]string)[0])
 		if err != nil {
 			return err
