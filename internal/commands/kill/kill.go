@@ -37,13 +37,13 @@ func (k *Kill) SetArguments(arg interface{}) error {
 
 		n, err := strconv.Atoi(arg.([]string)[0])
 		if err != nil {
-			return err
+			return msErr.ErrInvalidArg
 		}
 		k.Pid = n
 	case string:
 		n, err := strconv.Atoi(arg.(string))
 		if err != nil {
-			return err
+			return msErr.ErrInvalidArg
 		}
 		k.Pid = n
 	case int:

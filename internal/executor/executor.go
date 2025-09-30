@@ -9,6 +9,7 @@ import (
 	"minishell_go/internal/commands/ps"
 	"minishell_go/internal/commands/pwd"
 	msErr "minishell_go/internal/miniShell_errors"
+	"minishell_go/internal/parser"
 	"os"
 	"os/exec"
 )
@@ -18,10 +19,7 @@ type Executor interface {
 	SetArguments(interface{}) error
 }
 
-func Execute(command []string) error {
-	cmdName := command[0]
-	cmdArgs := command[1:]
-
+func getBuiltIn(name string) (Executor, bool) {
 	var builtInCmd = map[string]Executor{
 		"cd":   &cd.Cd{},
 		"pwd":  &pwd.Pwd{},
@@ -29,34 +27,38 @@ func Execute(command []string) error {
 		"kill": &kill.Kill{},
 		"ps":   &ps.Ps{},
 	}
+	action, ok := builtInCmd[name]
+	return action, ok
+}
 
-	if _, ok := builtInCmd[cmdName]; ok {
-		action := builtInCmd[cmdName]
-		err := action.SetArguments(cmdArgs)
-		if err != nil {
-			if errors.Is(err, msErr.ErrInvalidArg) {
-				_, err = fmt.Fprint(os.Stderr, msErr.ErrInvalidArg, "\n")
-				if err != nil {
-					return err
+func Execute(pipes []parser.Pipeline) error {
+	if len(pipes) == 0 {
+		return nil
+	}
+
+	if len(pipes) == 1 {
+		cmdName := pipes[0].Name
+		cmdArgs := pipes[0].Args
+
+		if action, ok := getBuiltIn(cmdName); ok {
+			if err := action.SetArguments(cmdArgs); err != nil {
+				if errors.Is(err, msErr.ErrInvalidArg) {
+					if _, werr := fmt.Fprint(os.Stderr, msErr.ErrInvalidArg, "\n"); werr != nil {
+						return werr
+					}
+					return nil
 				}
-				return nil
+				return err
 			}
-			return err
+			return action.Run()
 		}
-		err = action.Run()
-		if err != nil {
-			return err
-		}
-	} else {
+
 		cmd := exec.Command(cmdName, cmdArgs...)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
-		if err := cmd.Run(); err != nil {
-			return err
-		}
+		return cmd.Run()
 	}
-
 	return nil
 }

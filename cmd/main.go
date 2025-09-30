@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	shell := sh.Shell{}
 
 	err := shell.Run()
