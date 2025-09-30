@@ -9,11 +9,9 @@ import (
 )
 
 func main() {
-
 	shell := sh.Shell{}
-	app := sh.Runner(&shell)
 
-	err := app.Run()
+	err := shell.Run()
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			os.Exit(0)

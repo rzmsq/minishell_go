@@ -11,9 +11,6 @@ import (
 	"minishell_go/internal/parser"
 )
 
-type Runner interface {
-	Run() error
-}
 type Shell struct {
 }
 
@@ -29,8 +26,8 @@ func (sh *Shell) Run() error {
 			}
 			return err
 		}
-		args := parser.Parse(input)
-		err = executor.Execute(args)
+		command := parser.Parse(input)
+		err = executor.Execute(command)
 		if err != nil {
 			return err
 		}
