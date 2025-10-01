@@ -30,11 +30,17 @@ func getBuiltIn(name string) (Executor, bool) {
 	return action, ok
 }
 
-func Execute(pipes []parser.Pipeline) error {
+func Execute(pipes [][]parser.Pipeline) error {
 	if len(pipes) == 0 {
 		return nil
 	}
-	return executePipeline(pipes)
+	for _, pipe := range pipes {
+		err := executePipeline(pipe)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func executePipeline(pipes []parser.Pipeline) error {

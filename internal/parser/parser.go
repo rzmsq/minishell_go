@@ -9,14 +9,19 @@ type Command struct {
 
 type Pipeline Command
 
-func Parse(argStr string) []Pipeline {
-	commands := make([]Pipeline, 0)
+func Parse(argStr string) [][]Pipeline {
+	pipelines := make([][]Pipeline, 0)
+	pipeline := make([]Pipeline, 0)
 
-	commandsStr := strings.Split(argStr, "|")
-	for _, commandStr := range commandsStr {
-		fields := strings.Split(strings.TrimSpace(commandStr), " ")
-		commands = append(commands, Pipeline{Name: fields[0], Args: fields[1:]})
+	commandLines := strings.Split(argStr, "&&")
+	for _, commandLine := range commandLines {
+		pipes := strings.Split(commandLine, "|")
+		for _, pipe := range pipes {
+			fields := strings.Split(strings.TrimSpace(pipe), " ")
+			pipeline = append(pipeline, Pipeline{Name: fields[0], Args: fields[1:]})
+		}
+		pipelines = append(pipelines, pipeline)
 	}
 
-	return commands
+	return pipelines
 }
