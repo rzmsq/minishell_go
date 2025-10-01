@@ -2,19 +2,23 @@ package pwd
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
 type Pwd struct {
 }
 
-func (p *Pwd) Run() error {
+func (p *Pwd) Run(stdout io.Writer) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(dir)
+	_, err = fmt.Fprintln(stdout, dir)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

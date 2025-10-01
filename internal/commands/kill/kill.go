@@ -1,6 +1,7 @@
 package kill
 
 import (
+	"io"
 	"os"
 	"strconv"
 
@@ -11,7 +12,7 @@ type Kill struct {
 	Pid int
 }
 
-func (k *Kill) Run() error {
+func (k *Kill) Run(stdout io.Writer) error {
 	process, err := os.FindProcess(k.Pid)
 	if err != nil {
 		return err

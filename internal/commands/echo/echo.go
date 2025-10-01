@@ -2,6 +2,7 @@ package echo
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	msErr "minishell_go/internal/miniShell_errors"
@@ -11,8 +12,11 @@ type Echo struct {
 	Str []string
 }
 
-func (e *Echo) Run() error {
-	fmt.Println(strings.Join(e.Str, " "))
+func (e *Echo) Run(stdout io.Writer) error {
+	_, err := fmt.Fprintln(stdout, strings.Join(e.Str, ","))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -30,4 +34,9 @@ func (e *Echo) SetArguments(arg interface{}) error {
 		return msErr.ErrInvalidArg
 	}
 	return nil
+}
+
+func (e *Echo) RunWithIO(stdin io.Reader, stdout io.Writer) error {
+	_, err := fmt.Fprintln(stdout, strings.Join(e.Str, " "))
+	return err
 }

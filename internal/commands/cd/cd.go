@@ -1,6 +1,7 @@
 package cd
 
 import (
+	"io"
 	msErr "minishell_go/internal/miniShell_errors"
 	"os"
 )
@@ -9,7 +10,7 @@ type Cd struct {
 	Path string
 }
 
-func (c *Cd) Run() error {
+func (c *Cd) Run(stdout io.Writer) error {
 	return os.Chdir(c.Path)
 }
 
