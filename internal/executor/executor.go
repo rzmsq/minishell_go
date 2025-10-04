@@ -34,30 +34,28 @@ func Execute(pipes [][][]parser.Pipeline) error {
 	if len(pipes) == 0 {
 		return nil
 	}
-	for i, pipe := range pipes {
-		for j, p := range pipe {
-			err := executePipeline(p)
+	for _, andPipelines := range pipes {
+		allSucceeded := true
+		for _, pipeline := range andPipelines {
+			err := executePipeline(pipeline)
 			if err != nil {
-				if i < len(pipes)-1 {
-					break
-				} else {
-					return err
-				}
+				allSucceeded = false
+				break
 			}
-			if j == len(pipe)-1 {
-				return nil
-			}
+		}
+		if allSucceeded {
+			return nil
 		}
 	}
 	return nil
 }
 
 func executePipeline(pipes []parser.Pipeline) error {
-	var buffers []*bytes.Buffer
-
-	for i := 0; i < len(pipes)-1; i++ {
-		buffers = append(buffers, &bytes.Buffer{})
+	if len(pipes) == 0 {
+		return nil
 	}
+
+	buffers := make([]*bytes.Buffer, len(pipes)-1)
 
 	for i := 0; i < len(pipes); i++ {
 		pipe := pipes[i]
