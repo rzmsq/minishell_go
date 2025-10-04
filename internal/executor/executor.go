@@ -56,6 +56,9 @@ func executePipeline(pipes []parser.Pipeline) error {
 	}
 
 	buffers := make([]*bytes.Buffer, len(pipes)-1)
+	for i := range buffers {
+		buffers[i] = &bytes.Buffer{}
+	}
 
 	for i := 0; i < len(pipes); i++ {
 		pipe := pipes[i]

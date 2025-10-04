@@ -54,17 +54,17 @@ func parsePipelineWithRedirects(pipe string) Pipeline {
 	pipe = strings.TrimSpace(pipe)
 	p := Pipeline{}
 
-	if idx := strings.Index(pipe, ">"); idx != -1 {
-		parts := strings.SplitN(pipe, ">", 2)
-		pipe = strings.TrimSpace(parts[0])
-		p.OutputFile = strings.TrimSpace(parts[1])
-	}
-
 	if idx := strings.Index(pipe, ">>"); idx != -1 {
 		parts := strings.SplitN(pipe, ">>", 2)
 		pipe = strings.TrimSpace(parts[0])
 		p.AppendFile = strings.TrimSpace(parts[1])
 		p.OutputFile = "" // приоритет у >>
+	}
+
+	if idx := strings.Index(pipe, ">"); idx != -1 {
+		parts := strings.SplitN(pipe, ">", 2)
+		pipe = strings.TrimSpace(parts[0])
+		p.OutputFile = strings.TrimSpace(parts[1])
 	}
 
 	if idx := strings.Index(pipe, "<"); idx != -1 {
