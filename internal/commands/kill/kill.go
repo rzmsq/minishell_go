@@ -29,30 +29,26 @@ func (k *Kill) SetArguments(arg interface{}) error {
 		return msErr.ErrInvalidArg
 	}
 
-	switch arg.(type) {
+	switch v := arg.(type) {
 	case []string:
-		args := arg.([]string)
+		args := v
 		if len(args) == 0 {
 			return msErr.ErrInvalidArg
 		}
 
-		n, err := strconv.Atoi(arg.([]string)[0])
+		n, err := strconv.Atoi(v[0])
 		if err != nil {
 			return msErr.ErrInvalidArg
 		}
 		k.Pid = n
 	case string:
-		n, err := strconv.Atoi(arg.(string))
+		n, err := strconv.Atoi(v)
 		if err != nil {
 			return msErr.ErrInvalidArg
 		}
 		k.Pid = n
 	case int:
-		n, ok := arg.(int)
-		if !ok {
-			return msErr.ErrInvalidArg
-		}
-		k.Pid = n
+		k.Pid = v
 	default:
 		return msErr.ErrInvalidArg
 	}

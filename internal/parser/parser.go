@@ -7,8 +7,11 @@ import (
 )
 
 type Command struct {
-	Name string
-	Args []string
+	Name       string
+	Args       []string
+	InputFile  string
+	OutputFile string
+	AppendFile string
 }
 
 type Pipeline Command
@@ -23,14 +26,11 @@ func Parse(argStr string) [][][]Pipeline {
 			pipes := strings.Split(commandLine, "|")
 			pipeline := make([]Pipeline, 0, len(pipes))
 			for _, pipe := range pipes {
-				fields := strings.Split(strings.TrimSpace(pipe), " ")
-				pipeline = append(pipeline, Pipeline{Name: fields[0], Args: fields[1:]})
+				pipeline = append(pipeline, parsePipelineWithRedirects(pipe))
 			}
 			pipelines = append(pipelines, pipeline)
-			pipeline = nil
 		}
 		orPipelines = append(orPipelines, pipelines)
-		pipelines = nil
 	}
 
 	return orPipelines
@@ -48,4 +48,36 @@ func ParseEnvVars(s string) string {
 		}
 		return ""
 	})
+}
+
+func parsePipelineWithRedirects(pipe string) Pipeline {
+	pipe = strings.TrimSpace(pipe)
+	p := Pipeline{}
+
+	if idx := strings.Index(pipe, ">"); idx != -1 {
+		parts := strings.SplitN(pipe, ">", 2)
+		pipe = strings.TrimSpace(parts[0])
+		p.OutputFile = strings.TrimSpace(parts[1])
+	}
+
+	if idx := strings.Index(pipe, ">>"); idx != -1 {
+		parts := strings.SplitN(pipe, ">>", 2)
+		pipe = strings.TrimSpace(parts[0])
+		p.AppendFile = strings.TrimSpace(parts[1])
+		p.OutputFile = "" // приоритет у >>
+	}
+
+	if idx := strings.Index(pipe, "<"); idx != -1 {
+		parts := strings.SplitN(pipe, "<", 2)
+		pipe = strings.TrimSpace(parts[0])
+		p.InputFile = strings.TrimSpace(parts[1])
+	}
+
+	fields := strings.Fields(pipe)
+	if len(fields) > 0 {
+		p.Name = fields[0]
+		p.Args = fields[1:]
+	}
+
+	return p
 }

@@ -25,11 +25,11 @@ func (e *Echo) SetArguments(arg interface{}) error {
 		return msErr.ErrInvalidArg
 	}
 
-	switch arg.(type) {
+	switch v := arg.(type) {
 	case []string:
-		e.Str = arg.([]string)
+		e.Str = v
 	case string:
-		e.Str = []string{arg.(string)}
+		e.Str = []string{v}
 	default:
 		return msErr.ErrInvalidArg
 	}

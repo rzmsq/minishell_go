@@ -19,15 +19,14 @@ func (c *Cd) SetArguments(arg interface{}) error {
 		return msErr.ErrInvalidArg
 	}
 
-	switch arg.(type) {
+	switch v := arg.(type) {
 	case []string:
-		args := arg.([]string)
-		if len(args) == 0 {
+		if len(v) == 0 {
 			return msErr.ErrInvalidArg
 		}
-		c.Path = arg.([]string)[0]
+		c.Path = v[0]
 	case string:
-		c.Path = arg.(string)
+		c.Path = v
 	default:
 		return msErr.ErrInvalidArg
 	}
