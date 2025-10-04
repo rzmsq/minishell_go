@@ -1,6 +1,10 @@
 package parser
 
-import "strings"
+import (
+	"os"
+	"regexp"
+	"strings"
+)
 
 type Command struct {
 	Name string
@@ -30,4 +34,18 @@ func Parse(argStr string) [][][]Pipeline {
 	}
 
 	return orPipelines
+}
+
+func ParseEnvVars(s string) string {
+	re := regexp.MustCompile(`\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?`)
+	return re.ReplaceAllStringFunc(s, func(match string) string {
+		varName := strings.TrimPrefix(match, "$")
+		varName = strings.TrimPrefix(varName, "{")
+		varName = strings.TrimSuffix(varName, "}")
+
+		if value, exists := os.LookupEnv(varName); exists {
+			return value
+		}
+		return ""
+	})
 }

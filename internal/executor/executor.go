@@ -61,6 +61,12 @@ func executePipeline(pipes []parser.Pipeline) error {
 
 	for i := 0; i < len(pipes); i++ {
 		pipe := pipes[i]
+
+		args := make([]string, len(pipe.Args))
+		for j, arg := range pipe.Args {
+			args[j] = parser.ParseEnvVars(arg)
+		}
+
 		var input io.Reader
 		var output io.Writer
 
@@ -77,14 +83,14 @@ func executePipeline(pipes []parser.Pipeline) error {
 		}
 
 		if action, ok := getBuiltIn(pipe.Name); ok {
-			if err := action.SetArguments(pipe.Args); err != nil {
+			if err := action.SetArguments(args); err != nil {
 				return err
 			}
 			if err := action.Run(output); err != nil {
 				return err
 			}
 		} else {
-			cmd := exec.Command(pipe.Name, pipe.Args...)
+			cmd := exec.Command(pipe.Name, args...)
 			cmd.Stdin = input
 			cmd.Stdout = output
 			cmd.Stderr = os.Stderr
