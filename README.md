@@ -95,11 +95,8 @@ test
 test
 more
 
-> ps && echo "Success"
+> ps || echo "Success"
 # выполнится echo только если ps успешен
-
-> false || echo "Failed"
-Failed
 ```
 
 ## Структура проекта
